@@ -568,7 +568,7 @@ EditorUi.initMinimalTheme = function()
 			var div = document.createElement('div');
 			div.style.display = 'inline-block';
 			div.style.position = 'relative';
-			div.style.marginTop = '6px';
+			div.style.marginTop = '8px';
 			div.style.marginRight = '4px';
 			
 			var button = document.createElement('a');
@@ -578,10 +578,9 @@ EditorUi.initMinimalTheme = function()
 			
 			if (urlParams['noSaveBtn'] == '1')
 			{
-				var saveAndExitTitle = urlParams['publishClose'] == '1' ? mxResources.get('publish') : mxResources.get('saveAndExit');
-				mxUtils.write(button, saveAndExitTitle);
-				button.setAttribute('title', saveAndExitTitle);
-					
+				mxUtils.write(button, mxResources.get('saveAndExit'));
+				button.setAttribute('title', mxResources.get('saveAndExit'));
+				
 				mxEvent.addListener(button, 'click', mxUtils.bind(this, function()
 				{
 					this.actions.get('saveAndExit').funct();
@@ -622,9 +621,8 @@ EditorUi.initMinimalTheme = function()
 			if (urlParams['noExitBtn'] != '1')
 			{
 				button = document.createElement('a');
-				var exitTitle = urlParams['publishClose'] == '1' ? mxResources.get('close') : mxResources.get('exit');
-				mxUtils.write(button, exitTitle);
-				button.setAttribute('title', exitTitle);
+				mxUtils.write(button, mxResources.get('exit'));
+				button.setAttribute('title', mxResources.get('exit'));
 				button.className = 'geMenuItem';
 				button.style.marginLeft = '6px';
 				button.style.padding = '6px';
@@ -937,13 +935,9 @@ EditorUi.initMinimalTheme = function()
 			}
 			else if (urlParams['embed'] == '1')
 			{
-				if (urlParams['noSaveBtn'] != '1')
-				{
-					ui.menus.addMenuItems(menu, ['-', 'save'], parent);
-				}
-				
-				if (urlParams['saveAndExit'] == '1' || 
-					(urlParams['noSaveBtn'] == '1' && urlParams['saveAndExit'] != '0'))
+				ui.menus.addMenuItems(menu, ['-', 'save'], parent);
+
+				if (urlParams['saveAndExit'] == '1')
 				{
 					ui.menus.addMenuItems(menu, ['saveAndExit'], parent);
 				}
@@ -1908,28 +1902,21 @@ EditorUi.initMinimalTheme = function()
 
 		if (viewZoomMenu != null)
 		{
-			var fitFunction = function(evt)
+			var fitFunction = function()
 	        {
 	            graph.popupMenuHandler.hideMenu();
-
-				if (mxEvent.isAltDown(evt))
-				{
-					ui.actions.get('customZoom').funct();
-				}
-				else
-				{
-		        	var scale = graph.view.scale;
-		            var tx = graph.view.translate.x;
-		            var ty = graph.view.translate.y;
-		
-		        	ui.actions.get('resetView').funct();
-		        	
-		            // Toggle scale if nothing has changed
-		            if (Math.abs(scale - graph.view.scale) < 0.00001 && tx == graph.view.translate.x && ty == graph.view.translate.y)
-		            {
-		            	ui.actions.get((graph.pageVisible) ? 'fitPage' : 'fitWindow').funct();
-		            }
-				}
+	
+	        	var scale = graph.view.scale;
+	            var tx = graph.view.translate.x;
+	            var ty = graph.view.translate.y;
+	
+	        	ui.actions.get('resetView').funct();
+	        	
+	            // Toggle scale if nothing has changed
+	            if (Math.abs(scale - graph.view.scale) < 0.00001 && tx == graph.view.translate.x && ty == graph.view.translate.y)
+	            {
+	            	ui.actions.get((graph.pageVisible) ? 'fitPage' : 'fitWindow').funct();
+	            }
 	        };
 
         	var zoomInAction = ui.actions.get('zoomIn');

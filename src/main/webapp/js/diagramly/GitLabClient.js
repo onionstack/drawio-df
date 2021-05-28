@@ -1148,25 +1148,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn)
 	
 	var selectRepo = mxUtils.bind(this, function(page)
 	{
-		var spinner = this.ui.spinner;
-		var inFlightRequests = 0;
 		this.ui.spinner.stop();
-		
-		var spinnerRequestStarted = function()
-		{
-			spinner.spin(div, mxResources.get('loading'));
-			inFlightRequests += 1;
-		}
-
-		var spinnerRequestFinished = function()
-		{
-			inFlightRequests -= 1;
-			
-			if (inFlightRequests === 0)
-			{
-				spinner.stop();
-			}
-		}
 		
 		if (page == null)
 		{
@@ -1192,46 +1174,44 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn)
 		
 		var nextPage = mxUtils.bind(this, function()
 		{
-			if (inFlightRequests === 0)
-			{
-				selectRepo(page + 1);
-			}
+			selectRepo(page + 1);
 		});
 		
 		mxEvent.addListener(nextPageDiv, 'click', nextPage);
 
 		var listGroups = mxUtils.bind(this, function(callback)
 		{
-			spinnerRequestStarted();
+			this.ui.spinner.spin(div, mxResources.get('loading'));
 			var req = new mxXmlRequest(this.baseUrl + '/groups?per_page=100', null, 'GET');
 			
 			this.executeRequest(req, mxUtils.bind(this, function(req)
 			{
+				this.ui.spinner.stop();
 				callback(JSON.parse(req.getText()));
-				spinnerRequestFinished();
 			}), error);
 		});
 
 		var listProjects = mxUtils.bind(this, function(group, callback)
 		{
-			spinnerRequestStarted();
+			this.ui.spinner.spin(div, mxResources.get('loading'));
 			var req = new mxXmlRequest(this.baseUrl + '/groups/' + group.id + '/projects?per_page=100', null, 'GET');
 			
 			this.executeRequest(req, mxUtils.bind(this, function(req)
 			{
+				this.ui.spinner.stop();
 				callback(group, JSON.parse(req.getText()));
-				spinnerRequestFinished();
 			}), error);
 		});
 		
 		listGroups(mxUtils.bind(this, function(groups)
 		{
-			spinnerRequestStarted();
 			var req = new mxXmlRequest(this.baseUrl + '/users/' + this.user.id + '/projects?per_page=' +
 				pageSize + '&page=' + page, null, 'GET');
+			this.ui.spinner.spin(div, mxResources.get('loading'));
 			
 			this.executeRequest(req, mxUtils.bind(this, function(req)
 			{
+				this.ui.spinner.stop();
 				var repos = JSON.parse(req.getText());
 
 				if ((repos == null || repos.length == 0) && (groups == null || groups.length == 0))
@@ -1244,41 +1224,38 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn)
 					{
 						div.appendChild(createLink(mxResources.get('enterValue') + '...', mxUtils.bind(this, function()
 						{
-							if (inFlightRequests === 0)
+							var dlg = new FilenameDialog(this.ui, 'org/repo/ref', mxResources.get('ok'), mxUtils.bind(this, function(value)
 							{
-								var dlg = new FilenameDialog(this.ui, 'org/repo/ref', mxResources.get('ok'), mxUtils.bind(this, function(value)
+								if (value != null)
 								{
-									if (value != null)
+									var tokens = value.split('/');
+									
+									if (tokens.length > 1)
 									{
-										var tokens = value.split('/');
+										org = tokens[0];
+										repo = tokens[1];
+										path = null;
+										ref = null;
 										
-										if (tokens.length > 1)
+										if (tokens.length > 2)
 										{
-											org = tokens[0];
-											repo = tokens[1];
-											path = null;
-											ref = null;
-											
-											if (tokens.length > 2)
-											{
-												ref = encodeURIComponent(tokens.slice(2, tokens.length).join('/'));
-												selectFile();
-											}
-											else
-											{
-												selectRef(null, true);
-											}
+											ref = encodeURIComponent(tokens.slice(2, tokens.length).join('/'));
+											selectFile();
 										}
 										else
 										{
-											this.ui.spinner.stop();
-											this.ui.handleError({message: mxResources.get('invalidName')});
+											selectRef(null, true);
 										}
 									}
-								}), mxResources.get('enterValue'));
-								this.ui.showDialog(dlg.container, 300, 80, true, false);
-								dlg.init();
-							}
+									else
+									{
+										this.ui.spinner.stop();
+										this.ui.handleError({message: mxResources.get('invalidName')});
+									}
+								}
+							}), mxResources.get('enterValue'));
+							this.ui.showDialog(dlg.container, 300, 80, true, false);
+							dlg.init();
 						})));
 						
 						mxUtils.br(div);
@@ -1289,41 +1266,34 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn)
 					
 					for (var i = 0; i < repos.length; i++)
 					{
-						(mxUtils.bind(this, function(repository)
+						(mxUtils.bind(this, function(repository, idx)
 						{
 							var temp = listItem.cloneNode();
-							temp.style.backgroundColor = (gray) ?
+							temp.style.backgroundColor = (idx % 2 == 0) ?
 								((uiTheme == 'dark') ? '#000000' : '#eeeeee') : '';
 							gray = !gray;
 							
 							temp.appendChild(createLink(repository.name_with_namespace, mxUtils.bind(this, function()
 							{
-								if (inFlightRequests === 0)
-								{
-									org = repository.owner.username;
-									repo = repository.path;
-									path = '';
-									
-									selectRef(null, true);
-								}
+								org = repository.owner.username;
+								repo = repository.path;
+								path = '';
+								
+								selectRef(null, true);
 							})));
 							
 							div.appendChild(temp);
-						}))(repos[i]);
+						}))(repos[i], i);
 					}
 
 					for (var i = 0; i < groups.length; i++)
 					{
-						spinnerRequestStarted();
-						
 						listProjects(groups[i], (mxUtils.bind(this, function(group, projects)
 						{
-							spinnerRequestFinished();
-							
 							for (var j = 0; j < projects.length; j++)
 							{
 								var temp = listItem.cloneNode();
-								temp.style.backgroundColor = (gray) ?
+								temp.style.backgroundColor = (idx % 2 == 0) ?
 									((uiTheme == 'dark') ? '#000000' : '#eeeeee') : '';
 								gray = !gray;
 								
@@ -1331,14 +1301,11 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn)
 								{
 									temp.appendChild(createLink(project.name_with_namespace, mxUtils.bind(this, function()
 									{
-										if (inFlightRequests === 0)
-										{
-											org = group.full_path;
-											repo = project.path;
-											path = '';
-		
-											selectRef(null, true);
-										}
+										org = group.full_path;
+										repo = project.path;
+										path = '';
+	
+										selectRef(null, true);
 									})));
 	
 									div.appendChild(temp);
@@ -1346,8 +1313,6 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn)
 							}
 						})));
 					}
-					
-					spinnerRequestFinished();
 				}
 
 				if (repos.length == pageSize)

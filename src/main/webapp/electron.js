@@ -265,7 +265,6 @@ app.on('ready', e =>
 	}
 	
 	var options = program.opts();
-	
     //Start export mode?
     if (options.export)
 	{
