@@ -560,13 +560,13 @@
             }
         }));
 
-        editorUi.actions.addAction('support...', function() {
-            if (EditorUi.isElectronApp) {
-                editorUi.openLink('https://github.com/jgraph/drawio-desktop/wiki/Getting-Support');
-            } else {
-                editorUi.openLink('https://github.com/jgraph/drawio/wiki/Getting-Support');
-            }
-        });
+        // editorUi.actions.addAction('support...', function() {
+        //     if (EditorUi.isElectronApp) {
+        //         editorUi.openLink('https://github.com/jgraph/drawio-desktop/wiki/Getting-Support');
+        //     } else {
+        //         editorUi.openLink('https://github.com/jgraph/drawio/wiki/Getting-Support');
+        //     }
+        // });
 
         editorUi.actions.addAction('exportOptionsDisabled...', function() {
             editorUi.handleError({ message: mxResources.get('exportOptionsDisabledDetails') },
@@ -591,13 +591,13 @@
             editorUi.openLink('https://www.youtube.com/watch?v=Z0D96ZikMkc');
         });
 
-        editorUi.actions.addAction('forkme', function() {
-            if (EditorUi.isElectronApp) {
-                editorUi.openLink('https://github.com/jgraph/drawio-desktop');
-            } else {
-                editorUi.openLink('https://github.com/jgraph/drawio');
-            }
-        }).label = 'Fork me on GitHub...';
+        // editorUi.actions.addAction('forkme', function() {
+        //     if (EditorUi.isElectronApp) {
+        //         editorUi.openLink('https://github.com/jgraph/drawio-desktop');
+        //     } else {
+        //         editorUi.openLink('https://github.com/jgraph/drawio');
+        //     }
+        // }).label = 'Fork me on GitHub...';
 
         editorUi.actions.addAction('downloadDesktop...', function() {
             editorUi.openLink('https://get.diagrams.net/');

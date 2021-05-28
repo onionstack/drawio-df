@@ -19,7 +19,7 @@
     /**
      * Specifies the app name. Default is document.title.
      */
-    Editor.prototype.appName = 'df-diagram';
+    Editor.prototype.appName = 'DFDiagram';
 
     /**
      * Known file types.
