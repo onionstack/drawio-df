@@ -777,7 +777,7 @@ mxStencilRegistry.allowEval = false;
         var paths = dialog.showOpenDialogSync({
             defaultPath: lastDir || getDocumentsFolder(),
             filters: [
-                { name: 'draw.io Diagrams', extensions: ['drawio', 'xml', 'png', 'svg', 'html'] },
+                { name: 'draw.dfd Diagrams', extensions: ['dfd', 'xml', 'png', 'svg', 'html'] },
                 { name: 'VSDX Documents', extensions: ['vsdx'] },
                 { name: 'All Files', extensions: ['*'] }
             ],
@@ -836,9 +836,9 @@ mxStencilRegistry.allowEval = false;
                         var dot = name.lastIndexOf('.');
 
                         if (dot >= 0) {
-                            name = name.substring(0, name.lastIndexOf('.')) + '.drawio';
+                            name = name.substring(0, name.lastIndexOf('.')) + '.dfd';
                         } else {
-                            name = name + '.drawio';
+                            name = name + '.dfd';
                         }
 
                         if (xml.substring(0, 10) == '<mxlibrary') {
@@ -867,7 +867,7 @@ mxStencilRegistry.allowEval = false;
 
                     if (tmp != null) {
                         var name = fileEntry.name;
-                        fn(null, tmp, null, name.substring(0, name.lastIndexOf('.')) + '.drawio', isModified);
+                        fn(null, tmp, null, name.substring(0, name.lastIndexOf('.')) + '.dfd', isModified);
                         fileLoaded = true;
 
                         return;
@@ -1051,8 +1051,8 @@ mxStencilRegistry.allowEval = false;
 
         // Adds default extension
         if (filename.length > 0 && (!/(\.xml)$/i.test(filename) && !/(\.html)$/i.test(filename) &&
-                !/(\.svg)$/i.test(filename) && !/(\.png)$/i.test(filename) && !/(\.drawio)$/i.test(filename))) {
-            filename += '.drawio';
+                !/(\.svg)$/i.test(filename) && !/(\.png)$/i.test(filename) && !/(\.dfd)$/i.test(filename))) {
+            filename += '.dfd';
         }
 
         return filename;
